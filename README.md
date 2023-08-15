@@ -45,7 +45,7 @@ testing.
 
 To address domain logic correctness, tpafd relies on the test suite
 found in the Python-based [Pathfinder
-server](https://github.com/Ericsson/paf/)
+server](https://github.com/Ericsson/paf/).
 
 To run the server-level tests, check out and change the current
 working directory to the `paf` repository, and run:
