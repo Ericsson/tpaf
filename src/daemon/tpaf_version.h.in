@@ -1,0 +1,17 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright(c) 2023 Ericsson AB
+ */
+
+#ifndef TPAF_VERSION_H
+#define TPAF_VERSION_H
+
+#define TPAF_VERSION_MAJOR @TPAF_MAJOR_VERSION@
+
+#define TPAF_VERSION_MINOR @TPAF_MINOR_VERSION@
+
+#define TPAF_VERSION_PATCH @TPAF_PATCH_VERSION@
+
+#define TPAF_VERSION "@TPAF_VERSION@"
+
+#endif

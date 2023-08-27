@@ -13,6 +13,7 @@
 
 #include "log.h"
 #include "server.h"
+#include "tpaf_version.h"
 
 #define DEFAULT_LOG_LEVEL LOG_INFO
 
@@ -97,6 +98,8 @@ int main(int argc, char **argv)
     evsignal_add(&sigterm_event, NULL);
 
     struct server *servers[num_servers];
+
+    syslog(LOG_INFO, "tpafd version %s started.", TPAF_VERSION);
 
     int i;
 

@@ -14,6 +14,7 @@ AC_PROG_CC
 AC_SUBST([TPAF_MAJOR_VERSION], [tpaf_major_version])
 AC_SUBST([TPAF_MINOR_VERSION], [tpaf_minor_version])
 AC_SUBST([TPAF_PATCH_VERSION], [tpaf_patch_version])
+AC_SUBST([TPAF_VERSION], [tpaf_version])
 
 AC_USE_SYSTEM_EXTENSIONS
 
@@ -44,6 +45,6 @@ AM_CONDITIONAL([VALGRIND], [test "x$enable_valgrind" = "xyes"])
 
 AC_SUBST([AM_CFLAGS])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile src/daemon/tpaf_version.h])
 
 AC_OUTPUT
