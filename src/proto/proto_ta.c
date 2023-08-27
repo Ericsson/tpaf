@@ -152,6 +152,9 @@ static const struct proto_ta_type clients_ta =
         { PROTO_FIELD_CLIENT_ID, proto_field_type_uint63 },
         { PROTO_FIELD_CLIENT_ADDR, proto_field_type_str },
         { PROTO_FIELD_TIME, proto_field_type_uint63 }
+    },
+    .opt_fail_fields = {
+        { PROTO_FIELD_FAIL_REASON, proto_field_type_str }
     }
 };
 
