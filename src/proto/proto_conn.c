@@ -142,6 +142,17 @@ respond:
     queue_response(conn, response);
 }
 
+static void handle_no_hello(struct proto_conn *conn, struct proto_ta *ta)
+{
+    log_info_c(conn->log_ctx, "Rejected non-hello command issued "
+	       "before finishing protocol handshake.");
+
+    struct msg *response =
+	proto_ta_fail(ta, PROTO_FAIL_REASON_NO_HELLO);
+
+    queue_response(conn, response);
+}
+
 static void notify_sub_match(struct sub *sub, const struct service *service,
 			     enum sub_match_type match_type, void *cb_data)
 {
@@ -483,13 +494,9 @@ static int handle_req(struct proto_conn *conn, const struct msg *req_msg)
     if (strcmp(proto_ta_get_cmd(ta), PROTO_CMD_HELLO) == 0)
 	handle_hello(conn, ta);
     else {
-	if (!has_finished_handshake(conn)) {
-	    log_info_c(conn->log_ctx, "Denied to issue non-hello command "
-		       "before finishing handshake.");
-	    goto err;
-	}
-
-	if (strcmp(proto_ta_get_cmd(ta), PROTO_CMD_SUBSCRIBE) == 0)
+	if (!has_finished_handshake(conn))
+	    handle_no_hello(conn, ta);
+	else if (strcmp(proto_ta_get_cmd(ta), PROTO_CMD_SUBSCRIBE) == 0)
 	    handle_subscribe(conn, ta);
 	else if (strcmp(proto_ta_get_cmd(ta), PROTO_CMD_UNSUBSCRIBE) == 0)
 	    handle_unsubscribe(conn, ta);
