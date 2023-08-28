@@ -3,7 +3,8 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -g -Wall -Wmissing-prototypes -Werror
 
 AM_CPPFLAGS = -DSYSCONFDIR='"$(sysconfdir)"' \
-	-I$(srcdir)/src/util -I$(srcdir)/src/sd -I$(srcdir)/src/proto
+	-I$(srcdir)/src/util -I$(srcdir)/src/sd -I$(srcdir)/src/proto \
+	-I$(builddir)/src/daemon
 
 check_PROGRAMS = tpafd tpaftest
 
