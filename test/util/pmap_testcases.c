@@ -27,6 +27,8 @@ TESTCASE(pmap, random_basic)
 {
     struct pmap *map = pmap_create();
 
+    CHKINTEQ(pmap_size(map), 0);
+
     size_t num_entries = 1000 + tu_rand_max(1000);
     uint64_t keys[num_entries];
     void *values[num_entries];
@@ -41,6 +43,7 @@ TESTCASE(pmap, random_basic)
 	values[i] = (void *)tu_rand();
 
 	pmap_add(map, keys[i], values[i]);
+	CHKINTEQ(pmap_size(map), i + 1);
     }
 
     for (i = 0; i < num_entries; i++) {
@@ -62,9 +65,11 @@ TESTCASE(pmap, random_basic)
     }
 
     for (i = 0; i < num_entries; i++) {
-	if (deleted[i])
+	if (deleted[i]) {
 	    CHK(!pmap_has_key(map, keys[i]));
-	else {
+	    void *value = pmap_get(map, keys[i]);
+	    CHK(value == NULL);
+	} else {
 	    CHK(pmap_has_key(map, keys[i]));
 
 	    void *value = pmap_get(map, keys[i]);
