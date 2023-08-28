@@ -24,7 +24,8 @@ static void usage(const char *name)
     printf("  -s          Enable logging to standard error.\n");
     printf("  -l <level>  Filter levels below <level>. Default is \"%s\".\n",
 	   log_level_to_str(DEFAULT_LOG_LEVEL));
-    printf("  -h          Show this text.\n");
+    printf("  -v          Print version information.");
+    printf("  -h          Print this text.\n");
 }
 
 static void die(const char *fmt, ...)
@@ -52,7 +53,7 @@ int main(int argc, char **argv)
     bool log_to_stderr = false;
     int log_filter = LOG_INFO;
     int c;
-    while ((c = getopt(argc, argv, "sl:h")) != -1)
+    while ((c = getopt(argc, argv, "sl:vh")) != -1)
 	switch (c) {
 	case 's':
 	    log_to_stderr = true;
@@ -64,10 +65,16 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	    }
 	    break;
+	case 'v':
+	    printf("%s\n", TPAF_VERSION);
+	    exit(EXIT_SUCCESS);
+	    break;
 	case 'h':
-	case '?':
 	    usage(argv[0]);
 	    exit(EXIT_SUCCESS);
+	    break;
+	case '?':
+	    exit(EXIT_FAILURE);
 	    break;
 	}
 
