@@ -1,8 +1,8 @@
  -*- Autoconf -*-
 
-m4_define([tpaf_major_version], [0])
+m4_define([tpaf_major_version], [1])
 m4_define([tpaf_minor_version], [0])
-m4_define([tpaf_patch_version], [1])
+m4_define([tpaf_patch_version], [0])
 m4_define([tpaf_version],[tpaf_major_version.tpaf_minor_version.tpaf_patch_version])
 
 AC_INIT(ttpaf, [tpaf_version], [mattias.ronnblom@ericsson.com])
