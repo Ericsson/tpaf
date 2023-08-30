@@ -264,7 +264,7 @@ mkdir build; \\
 cd build; \\
 ../configure; \\
 make -j; \\
-""" % (tag_version(release_tag), release_commit)
+""" % (get_tag_version(release_tag), release_commit)
 
     run(cmd)
 
