@@ -63,4 +63,4 @@ information on how a Pathfinder service discovery system works.
 
 ### Manual pages
 
-* [pafd](https://ericsson.github.io/paf/man/tpafd.8.html)
+* [pafd](https://ericsson.github.io/tpaf/man/tpafd.8.html)
