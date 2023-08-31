@@ -636,13 +636,14 @@ static void set_field(json_t *req, const struct proto_field *field,
 	json_object_set_new(req, field->name, json_props);
 	break;
     }
-    case proto_field_type_match_type:
+    case proto_field_type_match_type: {
 	enum sub_match_type match_type =
 	    *((const enum sub_match_type *)field_value);
 
 	const char *match_type_s = enum_to_proto_match_type(match_type);
 	json_object_set_new(req, field->name, json_string(match_type_s));
 	break;
+    }
     }
 }
 
