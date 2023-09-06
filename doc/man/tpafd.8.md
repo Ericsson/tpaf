@@ -29,8 +29,14 @@ serve more than one service discovery domain.
    Enable logging to console (standard error). Console logging is
    disabled by default.
 
+ * `-y <facility>`
+   Set syslog facility to use. For example, `-y local0` will make pafd
+   set the facility to `LOG_LOCAL0` on all log messages.
+
  * `-l <level>`
-   Discard log messages with a severity level below <level>.
+   Discard log messages with a severity level below <level>. For example,
+   `-l notice` will filter out any log message a level lower than
+   `LOG_NOTICE` (i.e., `LOG_INFO` and `LOG_DEBUG`).
 
  * `-v`
    Display tpafd version information and exit.

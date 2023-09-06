@@ -118,68 +118,141 @@ GEN_LOG_C_FUN(log_info_c, LOG_INFO)
 GEN_LOG_C_FUN(log_warn_c, LOG_WARNING)
 GEN_LOG_C_FUN(log_error_c, LOG_ERR)
 
-#define TPAF_FACILITY LOG_DAEMON
-
-void log_init(int filter_level, bool stderr)
+void log_init(int filter_level, bool stderr, int facility)
 {
     int option = LOG_PID;
 
     if (stderr)
 	option |= LOG_PERROR;
 
-    openlog(NULL, option, TPAF_FACILITY);
+    openlog(NULL, option, facility);
 
     setlogmask(LOG_UPTO(filter_level));
 }
 
-struct level
+struct named_value
 {
     int value;
     const char *name;
 };
 
-static const struct level levels[] = {
-    {
-	.value = LOG_DEBUG,
-	.name = "debug"
-    },
-    {
-	.value = LOG_INFO,
-	.name = "info"
-    },
-    {
-	.value = LOG_ERR,
-	.name = "error"
+static const struct named_value facilities[] = {
+    { .value = LOG_AUTH, .name = "auth"},
+    { .value = LOG_AUTHPRIV, .name = "authpriv"},
+    { .value = LOG_CRON, .name = "cron"},
+    { .value = LOG_DAEMON, .name = "daemon"},
+    { .value = LOG_FTP, .name = "ftp"},
+    { .value = LOG_KERN, .name = "kern"},
+    { .value = LOG_LOCAL0, .name = "local0"},
+    { .value = LOG_LOCAL1, .name = "local1"},
+    { .value = LOG_LOCAL2, .name = "local2"},
+    { .value = LOG_LOCAL3, .name = "local3"},
+    { .value = LOG_LOCAL4, .name = "local4"},
+    { .value = LOG_LOCAL5, .name = "local5"},
+    { .value = LOG_LOCAL6, .name = "local6"},
+    { .value = LOG_LOCAL7, .name = "local7"},
+    { .value = LOG_LPR, .name = "lpr"},
+    { .value = LOG_MAIL, .name = "mail"},
+    { .value = LOG_NEWS, .name = "news"},
+    { .value = LOG_SYSLOG, .name = "syslog"},
+    { .value = LOG_USER, .name = "user"},
+    { .value = LOG_UUCP, .name = "uucp" }
+};
+
+static const size_t facilities_len = UT_ARRAY_LEN(facilities);
+
+static void named_values_foreach(const struct named_value *values, size_t len,
+				 log_foreach_cb cb, void *cb_data)
+{
+    size_t i;
+    for (i = 0; i < len; i++) {
+	const struct named_value *nv = &values[i];
+	cb(nv->value, nv->name, cb_data);
     }
+}
+
+struct search_state {
+    const char *name;
+    int value;
+};
+
+static void name_lookup_cb(int value, const char *name, void *cb_data)
+{
+    struct search_state *state = cb_data;
+
+    if (state->value == value)
+	state->name = name;
+}
+
+static const char *name_lookup(const struct named_value *values, size_t len,
+			       int needle_value)
+{
+    struct search_state state = {
+	.name = NULL,
+	.value = needle_value
+    };
+
+    named_values_foreach(values, len, name_lookup_cb, &state);
+
+    return state.name;
+}
+
+static void value_lookup_cb(int value, const char *name, void *cb_data)
+{
+    struct search_state *state = cb_data;
+
+    if (strcmp(state->name, name) == 0)
+	state->value = value;
+}
+
+static int value_lookup(const struct named_value *values, size_t len,
+			const char *needle_name)
+{
+    struct search_state state = {
+	.name = needle_name,
+	.value = -1
+    };
+
+    named_values_foreach(values, len, value_lookup_cb, &state);
+
+    return state.value;
+}
+
+int log_str_to_facility(const char *facility_s)
+{
+    return value_lookup(facilities, facilities_len, facility_s);
+}
+
+const char *log_facility_to_str(int facility)
+{
+    return name_lookup(facilities, facilities_len, facility);
+}
+
+void log_facility_foreach(log_foreach_cb cb, void *cb_data)
+{
+    named_values_foreach(facilities, facilities_len, cb, cb_data);
+}
+
+static const struct named_value levels[] = {
+    { .value = LOG_DEBUG, .name = "debug" },
+    { .value = LOG_INFO, .name = "info" },
+    { .value = LOG_ERR, .name = "error" }
 };
 static const size_t levels_len = UT_ARRAY_LEN(levels);
 
 int log_str_to_level(const char *level_s)
 {
-    size_t i;
-
-    for (i = 0; i < levels_len; i++) {
-	const struct level *level = &levels[i];
-
-	if (strcmp(level->name, level_s) == 0)
-	    return level->value;
-    }
-
-    return -1;
+    return value_lookup(levels, levels_len, level_s);
 }
 
 const char *log_level_to_str(int level_value)
 {
-    size_t i;
+    return name_lookup(levels, levels_len, level_value);
+}
 
-    for (i = 0; i < levels_len; i++) {
-	const struct level *level = &levels[i];
-
-	if (level->value == level_value)
-	    return level->name;
-    }
-
-    return NULL;
+void log_level_foreach(log_foreach_cb cb, void *cb_data)
+{
+    named_values_foreach(levels, levels_len, cb, cb_data);
 }
 
 bool log_is_debug_enabled(void)

@@ -16,16 +16,19 @@
 #include "tpaf_version.h"
 
 #define DEFAULT_LOG_LEVEL LOG_INFO
+#define DEFAULT_LOG_FACILITY LOG_DAEMON
 
 static void usage(const char *name)
 {
     printf("%s [options] [<domain-addr> ...]\n", name);
     printf("Options:\n");
-    printf("  -s          Enable logging to standard error.\n");
-    printf("  -l <level>  Filter levels below <level>. Default is \"%s\".\n",
-	   log_level_to_str(DEFAULT_LOG_LEVEL));
-    printf("  -v          Print version information.");
-    printf("  -h          Print this text.\n");
+    printf("  -s             Enable logging to standard error.\n");
+    printf("  -y <facility>  Set syslog facility to use. Default is "
+	   "\"%s\".\n", log_facility_to_str(DEFAULT_LOG_FACILITY));
+    printf("  -l <level>     Filter levels below <level>. Default is "
+	   "\"%s\".\n", log_level_to_str(DEFAULT_LOG_LEVEL));
+    printf("  -v             Print version information.\n");
+    printf("  -h             Print this text.\n");
 }
 
 static void die(const char *fmt, ...)
@@ -48,20 +51,55 @@ static void signal_cb(evutil_socket_t fd, short event, void *arg)
     event_base_loopbreak(event_base);
 }
 
+#define NAME_PER_LINE 8
+
+static void print_name(int value, const char *name, void *cb_data)
+{
+    int *count = cb_data;
+
+    printf("%-9s", name);
+
+    (*count)++;
+
+    if (*count % NAME_PER_LINE == 0)
+	printf("\n");
+}
+
+static void print_names(void (*foreach_fun)(log_foreach_cb, void *))
+{
+    int count = 0;
+    foreach_fun(print_name, &count);
+
+    if (count % NAME_PER_LINE != 0)
+	printf("\n");
+}
+
 int main(int argc, char **argv)
 {
     bool log_to_stderr = false;
-    int log_filter = LOG_INFO;
+    int log_facility = DEFAULT_LOG_FACILITY;
+    int log_filter = DEFAULT_LOG_LEVEL;
     int c;
-    while ((c = getopt(argc, argv, "sl:vh")) != -1)
+    while ((c = getopt(argc, argv, "sy:l:vh")) != -1)
 	switch (c) {
 	case 's':
 	    log_to_stderr = true;
 	    break;
+	case 'y':
+	    log_facility = log_str_to_facility(optarg);
+	    if (log_facility < 0) {
+		fprintf(stderr, "Unknown facility \"%s\". Valid facilities "
+			"are:\n", optarg);
+		print_names(log_facility_foreach);
+		exit(EXIT_FAILURE);
+	    }
+	    break;
 	case 'l':
 	    log_filter = log_str_to_level(optarg);
 	    if (log_filter < 0) {
-		fprintf(stderr, "Unknown filter level \"%s\".\n", optarg);
+		fprintf(stderr, "Unknown filter level \"%s\". Valid levels "
+			"are:\n", optarg);
+		print_names(log_level_foreach);
 		exit(EXIT_FAILURE);
 	    }
 	    break;
@@ -79,7 +117,7 @@ int main(int argc, char **argv)
 	}
 
 
-    log_init(log_filter, log_to_stderr);
+    log_init(log_filter, log_to_stderr, log_facility);
 
     int num_servers = argc - optind;
     if (num_servers == 0) {
