@@ -236,6 +236,8 @@ void log_facility_foreach(log_foreach_cb cb, void *cb_data)
 static const struct named_value levels[] = {
     { .value = LOG_DEBUG, .name = "debug" },
     { .value = LOG_INFO, .name = "info" },
+    { .value = LOG_NOTICE, .name = "notice" },
+    { .value = LOG_WARNING, .name = "warning" },
     { .value = LOG_ERR, .name = "error" }
 };
 static const size_t levels_len = UT_ARRAY_LEN(levels);
