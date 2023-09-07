@@ -110,7 +110,7 @@ def get_prev_release_tag(repo, release_version):
 
     candidate = None
 
-    for tag in release_tags[1:]:
+    for tag in release_tags:
         v = get_tag_version(tag)
 
         if v.major != release_version.major or \
@@ -194,7 +194,7 @@ def check_meta(repo, release_commit):
     else:
         prev_hdr_version = get_hdr_version(prev_release_tag.commit,
                                            prev_release_tag)
-        prev_reg_version = get_tag_version(prev_release_tag)
+        prev_tag_version = get_tag_version(prev_release_tag)
 
     print("Release information:")
     print("  Header version (from \"tpaf_version.h\"): %s" % hdr_version)
