@@ -33,6 +33,9 @@ serve more than one service discovery domain.
    Set syslog facility to use. For example, `-y local0` will make pafd
    set the facility to `LOG_LOCAL0` on all log messages.
 
+ * `-n`
+   Disable logging to syslog. Syslog logging is enabled by default.
+
  * `-l <level>`
    Discard log messages with a severity level below <level>. For example,
    `-l notice` will filter out any log message a level lower than

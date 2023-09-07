@@ -5,10 +5,16 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "util.h"
 
 #include "log.h"
+
+static char *log_ident;
+static unsigned log_flags;
+static int log_filter_level;
 
 struct log_ctx
 {
@@ -72,14 +78,26 @@ static char *ctx_get_full_prefix(const struct log_ctx *log_ctx)
 	return ut_strdup(log_ctx->prefix);
 }
 
-static void vlog_event(int syslog_prio, const struct log_ctx *log_ctx,
+static void vlog_event(int priority, const struct log_ctx *log_ctx,
 		       const char *format, va_list ap)
 {
-    char *prefix = ctx_get_full_prefix(log_ctx);
+    bool has_destination = log_flags&(LOG_USE_SYSLOG|LOG_USE_STDERR);
+
+    if (!has_destination || priority > log_filter_level)
+	return;
+
+    char *prefix = log_ctx != NULL ?
+	ctx_get_full_prefix(log_ctx) : ut_strdup("");
+
     char *payload = ut_vasprintf(format, ap);
     char *msg = ut_asprintf("%s%s", prefix, payload);
 
-    syslog(syslog_prio, "%s", msg);
+    if (log_flags&LOG_USE_SYSLOG)
+	syslog(priority, "%s", msg);
+
+    if (log_flags&LOG_USE_STDERR)
+	/* Format mimics that of syslog()+LOG_PERROR */
+	fprintf(stderr, "%s[%d]: %s\n", log_ident, getpid(), msg);
 
     ut_free(prefix);
     ut_free(payload);
@@ -118,16 +136,20 @@ GEN_LOG_C_FUN(log_info_c, LOG_INFO)
 GEN_LOG_C_FUN(log_warn_c, LOG_WARNING)
 GEN_LOG_C_FUN(log_error_c, LOG_ERR)
 
-void log_init(int filter_level, bool stderr, int facility)
+void log_init(const char *ident, int filter_level, int facility,
+	      unsigned int flags)
 {
-    int option = LOG_PID;
+    log_ident = ut_strdup(ident);
+    log_flags = flags;
+    log_filter_level = filter_level;
 
-    if (stderr)
-	option |= LOG_PERROR;
+    if (flags&LOG_USE_SYSLOG)
+	openlog(log_ident, LOG_PID, facility);
+}
 
-    openlog(NULL, option, facility);
-
-    setlogmask(LOG_UPTO(filter_level));
+void log_deinit(void)
+{
+    ut_free(log_ident);
 }
 
 struct named_value

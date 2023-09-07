@@ -24,7 +24,12 @@ void log_ctx_destroy(struct log_ctx *log_ctx);
 void log_ctx_set_prefix(struct log_ctx *log_ctx, const char *format, ...)
     __attribute__ ((format (printf, 2, 3)));
 
-void log_init(int filter_level, bool stderr, int facility);
+#define LOG_USE_SYSLOG (1U << 0)
+#define LOG_USE_STDERR (1U << 1)
+
+void log_init(const char *ident, int filter_level, int facility,
+	      unsigned flags);
+void log_deinit(void);
 
 void log_debug(const char *format, ...)
     __attribute__ ((format (printf, 1, 2)));

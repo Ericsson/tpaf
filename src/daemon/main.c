@@ -5,24 +5,28 @@
 
 #include <event.h>
 #include <getopt.h>
+#include <libgen.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #include <xcm.h>
 
 #include "log.h"
 #include "server.h"
 #include "tpaf_version.h"
+#include "util.h"
 
 #define DEFAULT_LOG_LEVEL LOG_INFO
 #define DEFAULT_LOG_FACILITY LOG_DAEMON
+#define DEFAULT_LOG_FLAGS LOG_USE_SYSLOG
 
 static void usage(const char *name)
 {
     printf("%s [options] [<domain-addr> ...]\n", name);
     printf("Options:\n");
     printf("  -s             Enable logging to standard error.\n");
+    printf("  -n             Disable logging to syslog.\n");
     printf("  -y <facility>  Set syslog facility to use. Default is "
 	   "\"%s\".\n", log_facility_to_str(DEFAULT_LOG_FACILITY));
     printf("  -l <level>     Filter levels below <level>. Default is "
@@ -51,6 +55,16 @@ static void signal_cb(evutil_socket_t fd, short event, void *arg)
     event_base_loopbreak(event_base);
 }
 
+static char *get_prg_name(const char *prg_path)
+{
+    const char *prg_name = strrchr(prg_path, '/');
+
+    if (prg_name == NULL)
+	return ut_strdup(prg_path);
+    else
+	return ut_strdup(&prg_name[1]);
+}
+
 #define NAME_PER_LINE 8
 
 static void print_name(int value, const char *name, void *cb_data)
@@ -76,14 +90,18 @@ static void print_names(void (*foreach_fun)(log_foreach_cb, void *))
 
 int main(int argc, char **argv)
 {
-    bool log_to_stderr = false;
     int log_facility = DEFAULT_LOG_FACILITY;
     int log_filter = DEFAULT_LOG_LEVEL;
+    unsigned log_flags = DEFAULT_LOG_FLAGS;
+
     int c;
-    while ((c = getopt(argc, argv, "sy:l:vh")) != -1)
+    while ((c = getopt(argc, argv, "sny:l:vh")) != -1)
 	switch (c) {
 	case 's':
-	    log_to_stderr = true;
+	    log_flags |= LOG_USE_STDERR;
+	    break;
+	case 'n':
+	    log_flags &= ~LOG_USE_SYSLOG;
 	    break;
 	case 'y':
 	    log_facility = log_str_to_facility(optarg);
@@ -116,8 +134,11 @@ int main(int argc, char **argv)
 	    break;
 	}
 
+    char *prg_name = get_prg_name(argv[0]);
 
-    log_init(log_filter, log_to_stderr, log_facility);
+    log_init(prg_name, log_filter, log_facility, log_flags);
+
+    ut_free(prg_name);
 
     int num_servers = argc - optind;
     if (num_servers == 0) {
@@ -144,7 +165,7 @@ int main(int argc, char **argv)
 
     struct server *servers[num_servers];
 
-    syslog(LOG_INFO, "tpafd version %s started.", TPAF_VERSION);
+    log_info("tpafd version %s started.", TPAF_VERSION);
 
     int i;
 
@@ -169,6 +190,8 @@ int main(int argc, char **argv)
 	server_destroy(servers[i]);
 
     event_base_free(event_base);
+
+    log_deinit();
 
     exit(EXIT_SUCCESS);
 }
