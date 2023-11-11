@@ -20,7 +20,7 @@ struct msg *msg_create(const void *data, size_t len)
 {
     struct msg *msg = ut_malloc(sizeof(struct msg));
 
-    msg->data = ut_dup(data, len);
+    msg->data = ut_memdup(data, len);
     msg->len = len;
 
     return msg;

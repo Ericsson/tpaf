@@ -22,7 +22,7 @@ void *ut_realloc(void *ptr, size_t size);
 void *ut_calloc(size_t size);
 void ut_free(void *ptr);
 
-void *ut_dup(const void *buf, size_t len);
+void *ut_memdup(const void *buf, size_t len);
 char *ut_strdup(const char *str);
 char *ut_strdup_non_null(const char *str);
 

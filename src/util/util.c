@@ -54,7 +54,7 @@ void ut_free(void *ptr)
     free(ptr);
 }
 
-void *ut_dup(const void *buf, size_t len)
+void *ut_memdup(const void *buf, size_t len)
 {
     void *copy = ut_malloc(len);
     memcpy(copy, buf, len);

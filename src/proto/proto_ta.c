@@ -377,7 +377,7 @@ static int get_fields(json_t *response, const struct proto_field *fields,
 		if (uint63_value < 0) /* not non-negative */
 		    goto err_free_fields;
 
-                arg = ut_dup(&uint63_value, sizeof(uint63_value));
+                arg = ut_memdup(&uint63_value, sizeof(uint63_value));
             }
             break;
         }
@@ -437,7 +437,7 @@ static int get_fields(json_t *response, const struct proto_field *fields,
                     goto err_free_fields;
                 }
 
-                arg = ut_dup(&match_type, sizeof(enum sub_match_type));
+                arg = ut_memdup(&match_type, sizeof(enum sub_match_type));
             }
 
             break;
