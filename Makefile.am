@@ -13,21 +13,13 @@ TEST_CPPFLAGS=-I$(srcdir)/test -I$(srcdir)/test/utest
 UTIL_SOURCES = src/util/util.c src/util/log.c src/util/plist.c \
 	src/util/pqueue.c src/util/slist.c src/util/pmap.c src/util/sbuf.c
 
-#SD_SOURCE_FILES = filter.c props.c pvalue.c
-#SD_SOURCES = $(foreach file,$(SD_SOURCE_FILES),src/sd/$(file))
 SD_SOURCES = src/sd/flist.c src/sd/filter.c src/sd/props.c \
 	src/sd/pvalue.c src/sd/generation.c src/sd/service.c \
 	src/sd/sub.c src/sd/db.c src/sd/conn.c src/sd/client.c \
 	src/sd/sd_err.c src/sd/sd.c
 
-#UTEST_SOURCE_FILES = utest.c utestreport.c utesthumanreport.c
-#UTEST_SOURCES = $(foreach file,$(UTEST_SOURCE_FILES),test/utest/$(file))
-
 TEST_SOURCES = test/utest/utest.c test/utest/utestreport.c \
 	test/utest/utesthumanreport.c test/testutil.c
-
-#SD_TC_FILES = value_testcases.c props_testcases.c filter_testcases.c
-#SD_TC_SOURCES = $(foreach file,$(SD_TC_FILES),test/$(file))
 
 UTIL_TC_SOURCES = test/util/pqueue_testcases.c test/util/pmap_testcases.c
 
