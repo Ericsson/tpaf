@@ -55,7 +55,7 @@ tpaftest-run: tpaftest
 tpaftest-run-valgrind: tpaftest
 	IN_VALGRIND=1 valgrind --tool=memcheck --leak-check=full -q \
 		--suppressions=./test/lttng.supp --num-callers=20 \
-		--error-exitcode=1 ./tpaftest -v -c $(TESTS)
+		--error-exitcode=3 ./tpaftest -v -c $(TESTS)
 
 BASIC_TEST_TARGETS=tpaftest-run
 
