@@ -7,7 +7,7 @@ cloud use.
 
 This repository contains `tpafd`, a footprint-optimized server-side
 implementation of the [Pathfinder
-protocol](https://github.com/Ericsson/paf/blob/master/doc/PROTOCOL.md)
+protocol](https://github.com/Ericsson/paf/blob/master/doc/PROTOCOLv2.md)
 version 2.
 
 ## Dependencies
