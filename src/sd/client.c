@@ -352,9 +352,29 @@ int client_unpublish(struct client *client, int64_t service_id)
     /* The client doing the unpublishing may not be the owner */
     int64_t owner_id = service_get_client_id(service);
 
-    struct client *owner = db_get_client(client->db, owner_id);
+    bool changed_client_id = client->client_id != owner_id;
+    bool is_orphan = service_is_orphan(service);
 
-    remove_service(owner, service_id);
+    /* A non-owner unpublish or an unpublish of an orphan service
+       implies a republish operation before the actual unpublish, to
+       allow the client to notice the difference between an unpublish
+       and an orphan timeout. */
+    if (changed_client_id || is_orphan) {
+	if (changed_client_id)
+	    capture_service(client, service);
+
+	service_modify_begin(service);
+	service_set_non_orphan(service);
+
+	if (changed_client_id)
+	    service_set_client_id(service, client->client_id);
+	if (is_orphan)
+	    service_set_non_orphan(service);
+
+	service_commit(service);
+    }
+
+    remove_service(client, service_id);
 
     return 0;
 }
