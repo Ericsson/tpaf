@@ -45,7 +45,8 @@ testing.
 
 To address domain logic correctness, tpafd relies on the test suite
 found in the Python-based [Pathfinder
-server](https://github.com/Ericsson/paf/).
+server](https://github.com/Ericsson/paf/) and
+the [libpaf client library](https://github.com/Ericsson/libpaf/).
 
 To run the server-level tests, check out and change the current
 working directory to the `paf` repository, and run:
@@ -57,7 +58,7 @@ make check TESTOPTS="--server tpaf"
 ## Documentation
 
 The [Pathfinder application protocol
-specification](https://github.com/Ericsson/paf/blob/master/doc/PROTOCOLv2.md),
+specification](https://github.com/Ericsson/paf/blob/master/doc/protocol/PROTOCOLv2.md),
 in particular the data model section, includes a lot of useful
 information on how a Pathfinder service discovery system works.
 
