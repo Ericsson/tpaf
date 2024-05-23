@@ -57,7 +57,7 @@ make check TESTOPTS="--server tpaf"
 ## Documentation
 
 The [Pathfinder application protocol
-specification](https://github.com/Ericsson/paf/blob/master/doc/PROTOCOL.md),
+specification](https://github.com/Ericsson/paf/blob/master/doc/PROTOCOLv2.md),
 in particular the data model section, includes a lot of useful
 information on how a Pathfinder service discovery system works.
 
