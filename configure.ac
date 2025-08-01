@@ -20,17 +20,17 @@ AC_USE_SYSTEM_EXTENSIONS
 
 LT_INIT
 
-AC_CHECK_HEADERS(xcm.h, [],
+AC_CHECK_HEADERS([xcm.h], [],
                  [AC_MSG_ERROR([Unable to find XCM header files.])])
-AC_CHECK_LIB(xcm, xcm_connect, [],
+AC_CHECK_LIB([xcm], [xcm_connect], [AC_SUBST([XCM_LIBS], [-lxcm])],
              [AC_MSG_ERROR([Unable to find the XCM library.])])
-AC_CHECK_HEADERS(jansson.h, [],
+AC_CHECK_HEADERS([jansson.h], [],
                  [AC_MSG_ERROR([Unable to find Jansson header files.])])
-AC_CHECK_LIB(jansson, json_loads, [],
+AC_CHECK_LIB([jansson], [json_loads], [AC_SUBST([JANSSON_LIBS], [-ljansson])],
              [AC_MSG_ERROR([Unable to find the Jansson library.])])
-AC_CHECK_HEADERS(event2/event.h, [],
+AC_CHECK_HEADERS([event2/event.h], [],
                  [AC_MSG_ERROR([Unable to libevent header files.])])
-AC_CHECK_LIB(event, event_base_new, [],
+AC_CHECK_LIB([event], [event_base_new], [AC_SUBST([EVENT_LIBS], [-levent])],
              [AC_MSG_ERROR([Unable to find the libevent library.])])
 
 AC_ARG_ENABLE([valgrind],
